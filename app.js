@@ -1,4 +1,5 @@
 var createError = require('http-errors');
+var cors = require('cors');
 var express = require('express');
 var logger = require('morgan');
 const koffi = require('koffi')
@@ -8,6 +9,7 @@ const os = require('os')
 var app = express();
 
 app.use(logger('dev'));
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
@@ -32,12 +34,86 @@ const sendHttpRequest = lib.func('char* send_http_request(const char* url)');
 
 const url = 'https://srv.moonshot.money/categories?limit=10';
 
+// Parse raw HTTP response
+function parseHttpResponse(rawResponse) {
+  // Split response into headers and body
+  const [headerPart, ...bodyParts] = rawResponse.split('\r\n\r\n');
+  const body = bodyParts.join('\r\n\r\n');
+
+  // Parse status line and headers
+  const [statusLine, ...headerLines] = headerPart.split('\r\n');
+  const [_, statusCode] = statusLine.match(/HTTP\/\d\.\d (\d+)/);
+  
+  // Parse headers
+  const headers = {};
+  headerLines.forEach(line => {
+    const [key, value] = line.split(': ').map(s => s.trim());
+    if (key && value) {
+      // Handle multiple headers with same name
+      if (headers[key]) {
+        if (Array.isArray(headers[key])) {
+          headers[key].push(value);
+        } else {
+          headers[key] = [headers[key], value];
+        }
+      } else {
+        headers[key.toLowerCase()] = value;
+      }
+    }
+  });
+
+  // Handle chunked transfer encoding
+  let parsedBody = body;
+  if (headers['transfer-encoding'] === 'chunked') {
+    const chunks = body.split('\r\n');
+    let decodedBody = '';
+    let i = 0;
+    
+    while (i < chunks.length) {
+      // Get chunk size (hex)
+      const chunkSize = parseInt(chunks[i], 16);
+      if (isNaN(chunkSize)) break;
+      
+      // Skip empty chunks
+      if (chunkSize === 0) break;
+      
+      // Get chunk data
+      i++;
+      if (i < chunks.length) {
+        decodedBody += chunks[i];
+      }
+      
+      // Move to next chunk
+      i++;
+    }
+    
+    parsedBody = decodedBody;
+  }
+
+  // Parse body if it's JSON
+  if (headers['content-type']?.includes('application/json')) {
+    try {
+      parsedBody = JSON.parse(parsedBody);
+    } catch (e) {
+      console.warn('Failed to parse JSON body:', e);
+    }
+  }
+
+  return {
+    statusCode: parseInt(statusCode, 10),
+    headers,
+    body: parsedBody
+  };
+}
+
 app.get('/', function (req, res) {
   try {
-    const result = sendHttpRequest(url);
-    res.json({ message: result });
+    const rawResponse = sendHttpRequest(url);
+    const parsedResponse = parseHttpResponse(rawResponse);
+    // res.json(parsedResponse);
+    res.json(parsedResponse.body);
   } catch (error) {
-    console.error('Error calling send_http_request:', error);
+    console.error('Error processing response:', error);
     res.status(500).json({ error: 'Failed to process request' });
   }
 });

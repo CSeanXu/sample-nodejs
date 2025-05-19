@@ -6,6 +6,7 @@
     "start": "node ./bin/www"
   },
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "~4.16.1",
     "http-errors": "~1.6.3",
     "koffi": "^2.11.0",
