@@ -86,9 +86,9 @@ function onListening() {
     ? 'pipe ' + addr
 	: 'port ' + addr.port;
 
-  for (let line of startupMessage.split("\n")) {
-    console.log(line);
-  }
+  // for (let line of startupMessage.split("\n")) {
+  //   console.log(line);
+  // }
 
   console.log('Server listening on ' + bind + ' 🚀');
 }
