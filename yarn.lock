@@ -194,10 +194,10 @@ ipaddr.js@1.9.1:
   resolved "https://registry.yarnpkg.com/ipaddr.js/-/ipaddr.js-1.9.1.tgz#bff38543eeb8984825079ff3a2a8e6cbd46781b3"
   integrity sha512-0KI/607xoxSToH7GjN1FfSbLoU0+btTicjsQSWQlh/hZykN8KpmMf7uYwPW3R+akZ6R/w18ZlXSHBYXiYUPO3g==
 
-koffi@^2.11.0:
-  version "2.11.0"
-  resolved "https://registry.yarnpkg.com/koffi/-/koffi-2.11.0.tgz#9836a56f727b896b7916a84e7954217c9548c624"
-  integrity sha512-AJ6MHz9Z8OIftKu322jrKJFvy/rZTdCD4b7F457WrK71rxYV7O5PSdWsJDN0p3rY1BZaPeLHVwyt4i2Xyk8wJg==
+koffi@^2.14.0:
+  version "2.14.0"
+  resolved "https://registry.yarnpkg.com/koffi/-/koffi-2.14.0.tgz#0e6cd85c64b1f2a157ae496acc41b23b83740d73"
+  integrity sha512-/ihgdvoeSSaX9S6nVNaZ/uPdYrpN0rIx15kgqzVdu6JPxo9jhc6Lh+dmxpURrEi8MAZcJqRLP1FFsmIF4uTZbg==
 
 media-typer@0.3.0:
   version "0.3.0"
